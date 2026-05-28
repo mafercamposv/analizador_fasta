@@ -43,3 +43,31 @@ def parsear_argumentos():
     )
 
     return parser.parse_args()
+
+
+def leer_fasta(ruta):
+    secuencias = []
+    encabezado_actual = None
+    secuencia_actual = ""
+
+    try:
+        with open(ruta, "r") as archivo:
+            for linea in archivo:
+                linea = linea.strip()
+                if not linea:
+                    continue
+
+                if linea.startswith(">"):
+                    if encabezado_actual is not None:
+                        secuencias.append((encabezado_actual, secuencia_actual))
+                    encabezado_actual = linea[1:].strip()
+                    secuencia_actual = ""
+                else:
+                    secuencia_actual += linea
+
+            if encabezado_actual is not None:
+                secuencias.append((encabezado_actual, secuencia_actual))
+    except FileNotFoundError as error:
+        raise SystemExit(f"ERROR: archivo no encontrado '{ruta}'") from error
+
+    return secuencias
