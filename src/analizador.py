@@ -106,3 +106,10 @@ def pasa_filtros(estadisticas, args):
         return False
 
     return True
+
+
+def escribir_resultados(stats, ruta):
+    with open(ruta, "w") as archivo:
+        archivo.write("Encabezado\tLongitud\tGC_Content\n")
+        for estad in stats:
+            archivo.write(f"{estad[0]}\t{estad[1]}\t{estad[2]:.2f}\n")
