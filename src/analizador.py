@@ -82,3 +82,14 @@ def calcular_gc(secuencia):
     c_count = secuencia.count("C")
     gc_content = (g_count + c_count) / longitud
     return gc_content
+
+
+def calcular_estadisticas(secuencias):
+    estadisticas = []
+    for encabezado, secuencia in secuencias:
+        encabezado = encabezado.strip()
+        longitud = len(secuencia)
+        gc_content = calcular_gc(secuencia)
+        estadisticas.append((encabezado, longitud, gc_content))
+
+    return estadisticas
