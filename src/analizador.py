@@ -113,3 +113,20 @@ def escribir_resultados(stats, ruta):
         archivo.write("Encabezado\tLongitud\tGC_Content\n")
         for estad in stats:
             archivo.write(f"{estad[0]}\t{estad[1]}\t{estad[2]:.2f}\n")
+
+
+def main():
+    args = parsear_argumentos()
+
+    print(f"Leyendo archivo: {args.input}")
+    secuencias = leer_fasta(args.input)
+    print(f"  {len(secuencias)} secuencias encontradas")
+
+    estadisticas = calcular_estadisticas(secuencias)
+    resultados_filtrados = [
+        estad_indiv for estad_indiv in estadisticas if pasa_filtros(estad_indiv, args)
+    ]
+    escribir_resultados(resultados_filtrados, args.output)
+
+    print(f"  {len(resultados_filtrados)} secuencias pasan los filtros")
+    print(f"Resultados escritos en '{args.output}'")
