@@ -93,3 +93,16 @@ def calcular_estadisticas(secuencias):
         estadisticas.append((encabezado, longitud, gc_content))
 
     return estadisticas
+
+
+def pasa_filtros(estadisticas, args):
+    if args.min_len > 0 and estadisticas[1] < args.min_len:
+        return False
+    if args.max_len > 0 and estadisticas[1] > args.max_len:
+        return False
+    if args.min_gc > 0 and estadisticas[2] < args.min_gc:
+        return False
+    if args.max_gc > 0 and estadisticas[2] > args.max_gc:
+        return False
+
+    return True
