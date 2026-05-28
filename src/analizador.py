@@ -71,3 +71,14 @@ def leer_fasta(ruta):
         raise SystemExit(f"ERROR: archivo no encontrado '{ruta}'") from error
 
     return secuencias
+
+
+def calcular_gc(secuencia):
+    longitud = len(secuencia)
+    if longitud == 0:
+        return 0.0
+
+    g_count = secuencia.count("G")
+    c_count = secuencia.count("C")
+    gc_content = (g_count + c_count) / longitud
+    return gc_content
