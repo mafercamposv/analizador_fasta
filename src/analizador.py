@@ -2,6 +2,11 @@ import argparse
 
 
 def parsear_argumentos():
+    """Parsear argumentos de la línea de comandos.
+
+    Returns:
+        argparse.Namespace: Argumentos leídos de la línea de comandos.
+    """
     parser = argparse.ArgumentParser(
         description="Generar estadísticas de secuencias a partir de un archivo FASTA"
     )
@@ -45,7 +50,23 @@ def parsear_argumentos():
     return parser.parse_args()
 
 
+# =========================================
+# lectura del archivo fasta y guardado de secuencias en listas de tuplas (encabezado, secuencia)
+# =========================================
+# =========================================
+# Responsabilidad: Leer secuencias desde archivo fasta y almacenarlas en una lista de tuplas (encabezado, secuencia)
+# Entrada: archivo
+# Salida: lista de tuplas de las secuencias
+# =========================================
 def leer_fasta(ruta):
+    """Leer secuencias desde un archivo FASTA.
+
+    Args:
+        ruta (str): Ruta del archivo FASTA de entrada.
+
+    Returns:
+        list[tuple[str, str]]: Lista de tuplas (encabezado, secuencia).
+    """
     secuencias = []
     encabezado_actual = None
     secuencia_actual = ""
@@ -73,7 +94,23 @@ def leer_fasta(ruta):
     return secuencias
 
 
+# =========================================
+# Cálculo de contenido de gc (secuencia)
+# =========================================
+# =========================================
+# Responsabilidad: calcular contenido gc de una secuencia dada
+# Entrada: secuencia
+# Salida: contenido gc
+# =========================================
 def calcular_gc(secuencia):
+    """Calcular contenido GC de una secuencia de ADN.
+
+    Args:
+        secuencia (str): Secuencia de ADN.
+
+    Returns:
+        float: Proporción de bases G y C entre 0 y 1.
+    """
     longitud = len(secuencia)
     if longitud == 0:
         return 0.0
@@ -84,7 +121,23 @@ def calcular_gc(secuencia):
     return gc_content
 
 
+# =========================================
+# Cálculo de estadísticas para tuplas (encabezado, secuencia)
+# =========================================
+# =========================================
+# Responsabilidad: calcular estadísticas para una lista de tuplas (encabezado, secuencia)
+# Entrada: lista de tuplas (encabezado, secuencia)
+# Salida: lista de tuplas con estadísticas
+# =========================================
 def calcular_estadisticas(secuencias):
+    """Calcular estadísticas de una lista de secuencias FASTA.
+
+    Args:
+        secuencias (list[tuple[str, str]]): Lista de tuplas (encabezado, secuencia).
+
+    Returns:
+        list[tuple[str, int, float]]: Lista de tuplas (encabezado, longitud, contenido_gc).
+    """
     estadisticas = []
     for encabezado, secuencia in secuencias:
         encabezado = encabezado.strip()
@@ -95,6 +148,14 @@ def calcular_estadisticas(secuencias):
     return estadisticas
 
 
+# =========================================
+# FILTROS para las estadísticas de las secuencias
+# =========================================
+# =========================================
+# Responsabilidad: decidir si una secuencia debe conservarse según los filtros indicados por el usuario
+# Entrada: estadísticas de una secuencia y argumentos de los filtros
+# Salida: booleano indicando si la secuencia pasa los filtros o no
+# =========================================
 def pasa_filtros(estadisticas, args):
     if args.min_len > 0 and estadisticas[1] < args.min_len:
         return False
@@ -105,17 +166,32 @@ def pasa_filtros(estadisticas, args):
     if args.max_gc > 0 and estadisticas[2] > args.max_gc:
         return False
 
-    return True
+    return True  # si todas cumplen con false, entonces pasa los filtros
+
+
+# =========================================
+# Escribir resultados en un archivo TSV
+# =========================================
+# =========================================
+# Responsabilidad: escribir resultados en un archivo TSV con encabezados y estadísticas de las secuencias que pasaron los filtros
+# Entrada: estadísticas de las secuencias que pasaron los filtros y ruta del archivo de salida
+# Salida: archivo TSV con los resultados
+# =========================================
 
 
 def escribir_resultados(stats, ruta):
+    ##Esta función escribirá el archivo final en formato TSV.
+    # Debe incluir una primera línea con los nombres de las columnas
     with open(ruta, "w") as archivo:
-        archivo.write("Encabezado\tLongitud\tGC_Content\n")
+        archivo.write("Encabezado\tLongitud\tGC_Content\n")  # Escribir encabezado
         for estad in stats:
-            archivo.write(f"{estad[0]}\t{estad[1]}\t{estad[2]:.2f}\n")
+            archivo.write(
+                f"{estad[0]}\t{estad[1]}\t{estad[2]:.2f}\n"
+            )  # Escribir cada estadística
 
 
 def main():
+    """Punto de entrada principal del programa."""
     args = parsear_argumentos()
 
     print(f"Leyendo archivo: {args.input}")
@@ -124,9 +200,13 @@ def main():
 
     estadisticas = calcular_estadisticas(secuencias)
     resultados_filtrados = [
-        estad_indiv for estad_indiv in estadisticas if pasa_filtros(estad_indiv, args)
+        estad for estad in estadisticas if pasa_filtros(estad, args)
     ]
     escribir_resultados(resultados_filtrados, args.output)
 
     print(f"  {len(resultados_filtrados)} secuencias pasan los filtros")
     print(f"Resultados escritos en '{args.output}'")
+
+
+if __name__ == "__main__":
+    main()
